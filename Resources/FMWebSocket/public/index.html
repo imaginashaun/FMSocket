@@ -3,177 +3,205 @@
 <head>
     <title>Soccer YellowDot</title>
     <script src="lib/gunzip.min.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!--   <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
 
-    <style>
-        table
-        {
-            padding:4px;
-            height:15px;
-            border:2px solid black;
-            border-radius:10px;
-        }
-        td
-        {
-            height:20px;
-        }
+      <style>
+          table
+          {
+              padding:4px;
+              height:15px;
+              border:2px solid black;
+              border-radius:10px;
+          }
+          td
+          {
+              height:20px;
+          }
 
-        html {
-            touch-action: none;
-        }
-        body
-        {
-            touch-action: none;
-            font-family: "Arial Black",sans-serif;
-            background: rgba(117, 19, 219, 0.74);
-          text-align:left;
-            -webkit-user-select: none; /* Disable text selection on iOS */
-            -moz-user-select: none; /* Disable text selection on Firefox */
-            -ms-user-select: none; /* Disable text selection on Microsoft Edge */
-            user-select: none; /* Disable text selection on modern browsers */
+          html {
+              touch-action: none;
+          }
+          body
+          {
+              touch-action: none;
+              font-family: "Arial Black",sans-serif;
+            /* background: rgba(117, 19, 219, 0.74);*/
+              background: black;
+            text-align:left;
+              -webkit-user-select: none; /* Disable text selection on iOS */
+              -moz-user-select: none; /* Disable text selection on Firefox */
+              -ms-user-select: none; /* Disable text selection on Microsoft Edge */
+              user-select: none; /* Disable text selection on modern browsers */
 
-            padding: 0px;
-            margin:0px;
-        }
-
-
-
-
-        .arrow-block {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .arrow {
-            width: 0;
-            height: 0;
-            border-style: solid;
-            position: relative;
-            margin: 10px;
-        }
-
-        .bottom {
-            border-width: 20px 20px 0 20px;
-            border-color: #ffffff transparent transparent transparent;
-        }
-
-        .left {
-            border-width: 20px 20px 20px 0;
-            border-color: transparent #ffffff transparent transparent;
-        }
-
-        .up {
-            border-width: 0 20px 20px 20px;
-            border-color: transparent transparent #ffffff transparent;
-        }
-
-        .right {
-            border-width: 20px 0 20px 20px;
-            border-color: transparent transparent transparent #ffffff;
-        }
+              padding: 0px;
+              margin:0px;
+          }
 
 
-        .circle-button {
-            display: inline-flex;
-            width: 50px;
-            height: 50px;
-            background-color: #ffffff;
-            color: black;
-            border-radius: 50%;
-            justify-content: center;
-            align-items: center;
-            margin: 10px;
-            font-size: 38pt;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <table style="width:100%; display: none">
+
+
+          .arrow-block {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+          }
+
+          .arrow {
+              width: 0;
+              height: 0;
+              border-style: solid;
+              position: relative;
+              margin: 10px;
+          }
+
+          .bottom {
+              border-width: 20px 20px 0 20px;
+              border-color: #ffffff transparent transparent transparent;
+          }
+
+          .left {
+              border-width: 20px 20px 20px 0;
+              border-color: transparent #ffffff transparent transparent;
+          }
+
+          .up {
+              border-width: 0 20px 20px 20px;
+              border-color: transparent transparent #ffffff transparent;
+          }
+
+          .right {
+              border-width: 20px 0 20px 20px;
+              border-color: transparent transparent transparent #ffffff;
+          }
+
+
+          .circle-button {
+              display: inline-flex;
+              width: 50px;
+              height: 50px;
+              background-color: #ffffff;
+              color: black;
+              border-radius: 50%;
+              justify-content: center;
+              align-items: center;
+              margin: 10px;
+              font-size: 38pt;
+              cursor: pointer;
+          }
+      </style>
+      <script src="lib/joy.js"></script>
+      <style>
+          html, body {
+              height: 100%;
+              margin: 0;
+              padding: 0;
+              overflow: hidden;
+              position: relative; /* Ensure relative positioning for the img container */
+          }
+
+          .img-container {
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              max-width: 100vw;
+              max-height: 100vh;
+          }
+
+          img {
+              width: 100%;
+              height: 100%;
+              object-fit: scale-down;
+          }
+
+          /* Add additional styles for your dynamic content (island area) here */
+      </style>
+  </head>
+  <body>
+
+
+
+      <table style="width:100%; display: none">
+          <tr>
+              <th><span id="StatusTextConnection">Status: no connection</span></th>
+              <th>IP Address <input type="text" id="IpAddress" value="http://localhost:3000"></th>
+              <th><button onclick="ConnectAsServer()"><Strong id="BtnServerText">Connect as Server</Strong></button></th>
+              <th><button onclick="ConnectAsClient()"><Strong id="BtnClientText">Connect as Client</Strong></button></th>
+          </tr>
+          <tr>
+              <th><button onclick="FMSendStringToAll('AAA')"><Strong>"A" To All</Strong></button></th>
+              <th><button onclick="FMSendStringToServer('BBB')"><Strong>"B" To Server</Strong></button></th>
+              <th><button onclick="FMSendStringToOthers('CCC')"><Strong>"C" To Others</Strong></button></th>
+          </tr>
+          <tr>
+              <th><button onclick=TestByteToAll(3)><Strong>byte[3] To All</Strong></button></th>
+              <th><button onclick=TestByteToServer(4)><Strong>byte[4] To Server</Strong></button></th>
+              <th><button onclick=TestByteToOthers(5)><Strong>byte[5] To Others</Strong></button></th>
+          </tr>
+
+          <tr>
+              <th><span>Received Data: </span></th>
+              <th><span id="StatusTextString">(string) null</span></th>
+              <th><span id="StatusTextBytes">(byte) null</span></th>
+          </tr>
+          <tr>
+              <th>Video Label <input type="text" id="LabelVideo" value="1001"></th>
+              <th><span id="StatusTextVideoInfo">info: null</span></th>
+              <th><span id="StatusTextVideo">(kB) </span></th>
+          </tr>
+          <tr>
+              <th>Audio Label <input type="text" id="LabelAudio" value="2001"></th>
+              <th><span id="StatusTextAudioInfo">info: null</span></th>
+              <th><span id="StatusTextAudio">(kB) </span></th>
+          </tr>
+      </table>
+
+
+      <table style="width:100%; display: none">
         <tr>
-            <th><span id="StatusTextConnection">Status: no connection</span></th>
-            <th>IP Address <input type="text" id="IpAddress" value="http://localhost:3000"></th>
-            <th><button onclick="ConnectAsServer()"><Strong id="BtnServerText">Connect as Server</Strong></button></th>
-            <th><button onclick="ConnectAsClient()"><Strong id="BtnClientText">Connect as Client</Strong></button></th>
+            <th><span id="StatusTextConnection">Experiment Feature: </span></th>
+                <th><span id="StatusTextConnection">HTML Mic Stream</span></th>
         </tr>
         <tr>
-            <th><button onclick="FMSendStringToAll('AAA')"><Strong>"A" To All</Strong></button></th>
-            <th><button onclick="FMSendStringToServer('BBB')"><Strong>"B" To Server</Strong></button></th>
-            <th><button onclick="FMSendStringToOthers('CCC')"><Strong>"C" To Others</Strong></button></th>
+            <th>Mic SampleRate <input type="text" id="MicSampleRate" value="24000"></th>
+            <th>Mic Label <input type="text" id="MicLabel" value="2001"></th>
         </tr>
         <tr>
-            <th><button onclick=TestByteToAll(3)><Strong>byte[3] To All</Strong></button></th>
-            <th><button onclick=TestByteToServer(4)><Strong>byte[4] To Server</Strong></button></th>
-            <th><button onclick=TestByteToOthers(5)><Strong>byte[5] To Others</Strong></button></th>
+            <th><button onclick=FMStartMicStream('SendToAll')><Strong id="BtnMicTextAll">Mic To All</Strong></button></th>
+            <th><button onclick=FMStartMicStream('SendToServer')><Strong id="BtnMicTextServer">Mic To Server</Strong></button></th>
+            <th><button onclick=FMStartMicStream('SendToOthers')><Strong id="BtnMicTextOthers">Mic To Others</Strong></button></th>
         </tr>
-
-        <tr>
-            <th><span>Received Data: </span></th>
-            <th><span id="StatusTextString">(string) null</span></th>
-            <th><span id="StatusTextBytes">(byte) null</span></th>
-        </tr>
-        <tr>
-            <th>Video Label <input type="text" id="LabelVideo" value="1001"></th>
-            <th><span id="StatusTextVideoInfo">info: null</span></th>
-            <th><span id="StatusTextVideo">(kB) </span></th>
-        </tr>
-        <tr>
-            <th>Audio Label <input type="text" id="LabelAudio" value="2001"></th>
-            <th><span id="StatusTextAudioInfo">info: null</span></th>
-            <th><span id="StatusTextAudio">(kB) </span></th>
-        </tr>
-    </table>
+      </table>
 
 
-    <table style="width:100%; display: none">
-      <tr>
-          <th><span id="StatusTextConnection">Experiment Feature: </span></th>
-              <th><span id="StatusTextConnection">HTML Mic Stream</span></th>
-      </tr>
-      <tr>
-          <th>Mic SampleRate <input type="text" id="MicSampleRate" value="24000"></th>
-          <th>Mic Label <input type="text" id="MicLabel" value="2001"></th>
-      </tr>
-      <tr>
-          <th><button onclick=FMStartMicStream('SendToAll')><Strong id="BtnMicTextAll">Mic To All</Strong></button></th>
-          <th><button onclick=FMStartMicStream('SendToServer')><Strong id="BtnMicTextServer">Mic To Server</Strong></button></th>
-          <th><button onclick=FMStartMicStream('SendToOthers')><Strong id="BtnMicTextOthers">Mic To Others</Strong></button></th>
-      </tr>
-    </table>
 
-    <center>    <span style="color: white">Yellow Dot Soccer Demo (1 Player Session Limit)</span></center>
+      <div class="img-container">
+
+      <img id="DisplayImg" />
+      </div>
+
+      <center>
+          <span style="color: white">Yellow Dot Soccer Demo (1 Player Session Limit)</span>
+      </center>
 
 
-    <img id="DisplayImg" src="" width=100%  />
+  <div style="position:absolute; right: 10px; bottom: 10px; height: 100px">
+      <div class="circle-button" data-direction="a">A</div>
+      <div class="circle-button" data-direction="b">B</div>
+      <div class="circle-button" data-direction="x">x</div>
+  </div>
 
 
-    <div class="arrow-block" style="position:absolute; left: 10px; bottom: 0px; height: 120px; width: 140px;">
-        <div class="arrow up" style="position:absolute; top:0px; left: 45px" data-direction="up"
-             ontouchstart="dodirection('add-up')"
-             ontouchend="dodirection('remove-up')"
-        ></div>
-        <div class="arrow right" style="position:absolute; right:0px; top: 30px" data-direction="right"
-             ontouchstart="dodirection('add-right')"
-             ontouchend="dodirection('remove-right')"
-        ></div>
-        <div class="arrow bottom" style="position:absolute; bottom:0px; left: 45px" data-direction="down"
-             ontouchstart="dodirection('add-down')"
-             ontouchend="dodirection('remove-down')"
-        ></div>
-        <div class="arrow left" style="position:absolute;left:5px; top: 30px" data-direction="left"
-             ontouchstart="dodirection('add-left')"
-             ontouchend="dodirection('remove-left')"
-        ></div>
-    </div>
+      <img id="fullscreenImage" src="lib/one.png" alt="Full screen image">
 
-<div style="position:absolute; right: 10px; bottom: 10px; height: 100px">
+      <!--    <canvas id="canvas" />-->
 
-    <div class="circle-button" data-direction="a">A</div>
-    <div class="circle-button" data-direction="b">B</div>
+    <div id="joyDiv" style="width:200px;height:200px;margin:10px 50px;position:fixed;bottom:0px;left:0px; opacity: 0.5"></div>
 
-</div>
-    <canvas id="canvas" />
+
+
     <script type="text/javascript">
         //You may set "canAutoConnectAsClient" to true, and it will automatically connect as client;
         var canAutoConnectAsClient = true;
@@ -863,13 +891,18 @@
         }
 
 
-        function dodirection(direction){
-            FMSendStringToServer(direction);
-            console.log(direction)
+        function dodirection(directionString){
+if(directionString !== "") {
+    const actions = directionString.split(", ");
+    for (const direction of actions) {
+        FMSendStringToServer(direction);
+        console.log(direction)
+    }
+}
         }
 
 
-        const arrowElements = document.querySelectorAll(".arrow, .circle-button");
+        const arrowElements = document.querySelectorAll(".circle-button");
         arrowElements.forEach(function (arrowElement) {
             arrowElement.addEventListener("click", function () {
                 const direction = arrowElement.getAttribute("data-direction");
@@ -878,6 +911,112 @@
              //   alert("Clicked arrow with direction: " + direction);
             });
         });
+
+
+
+
+
+        // Create JoyStick object into the DIV 'joyDiv'
+        var joyParam = { "title": "joystick", "internalFillColor":"#ffffff", "externalStrokeColor":"#ffffff" };
+
+        var joy = new JoyStick('joyDiv',joyParam);
+
+
+
+        function compassToDirectionWithChanges(compassToConvert) {
+            if (typeof compassToDirectionWithChanges.previousDirections === 'undefined') {
+                compassToDirectionWithChanges.previousDirections = {};
+            }
+
+            let direction = "";
+            const currentDirections = {};
+
+            if (compassToConvert.includes("N")) {
+                currentDirections.up = true;
+            }
+
+            if (compassToConvert.includes("S")) {
+                currentDirections.down = true;
+            }
+
+            if (compassToConvert.includes("E")) {
+                currentDirections.right = true;
+            }
+
+            if (compassToConvert.includes("W")) {
+                currentDirections.left = true;
+            }
+
+            // Determine added directions
+            for (const dir in currentDirections) {
+                if (!compassToDirectionWithChanges.previousDirections[dir]) {
+                    direction += `add-${dir}, `;
+                }
+            }
+
+            // Determine removed directions
+            for (const dir in compassToDirectionWithChanges.previousDirections) {
+                if (!currentDirections[dir]) {
+                    direction += `remove-${dir}, `;
+                }
+            }
+
+            // Remove the trailing comma and space
+            direction = direction.replace(/, $/, "");
+
+            // Update previousDirections for the next call
+            compassToDirectionWithChanges.previousDirections = { ...currentDirections };
+
+            return direction;
+        }
+
+        // Example usage:
+        let previousDirections = {};
+
+
+        setInterval(function(){
+
+
+            if(joy.GetDir() !== "C") {
+                dodirection(compassToDirectionWithChanges(joy.GetDir()));
+                console.log(compassToDirectionWithChanges(joy.GetDir()));
+            }
+        }, 50);
+
     </script>
+
+
+
+      <style>
+          /* Ensure the image takes up the entire viewport */
+          #fullscreenImage {
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100vw;
+              height: 100vh;
+              object-fit: cover; /* Keep the image's aspect ratio while covering the full viewport */
+              z-index: 1000; /* Ensure the image is on top of other content */
+          }
+      </style>
+
+      <script>
+          // JavaScript to hide the image when clicked
+          document.getElementById('fullscreenImage').addEventListener('click', function() {
+              this.style.display = 'none'; // Hide the image
+          });
+      </script>
+
+  </body>
+</html>
+Replace path_to_your_image.jpg with the actual path to your image.
+
+Serve the HTML: You can now save this code as an .html file and open it in a web browser. When you click on the image, it will hide, revealing anything that might be behind it (in this case, just a white background).
+
+If you have additional content behind the image that you want to reveal upon clicking, simply add that content to the <body> of the HTML
+
+
+
+
 </body>
 </html>
