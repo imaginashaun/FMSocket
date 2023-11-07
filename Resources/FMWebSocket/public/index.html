@@ -726,37 +726,6 @@
             if (dataID > maxID) dataID = 0;
           }
 
-          //old method but not work: not sure how to get PCM16 correctly...?
-          /*
-          navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream)
-          {
-            recorder = new MediaRecorder(stream);
-            if (recorder.state === "recording")
-            {
-              recorder.stop();
-            }
-            else
-            {
-              recorder.start(1000);
-              recorder.addEventListener('dataavailable', (async event => {
-                if (typeof event.data === 'undefined') return;
-                if (event.data.size === 0) return;
-                event.data.arrayBuffer().then(buffer => FMStreamAudioByteToAll(new Uint8Array(buffer)) );
-              }));
-            }
-          });
-          */
-
-          //new method, ref: https://medium.com/@ragymorkos/8d4abf81164d
-          /*
-          // Seems Safari not working, which require mediaDevices checking instead...
-          // navigator.getUserMedia = navigator.getUserMedia ||  navigator.webkitGetUserMedia ||  navigator.mozGetUserMedia ||  navigator.msGetUserMedia;
-          // if (navigator.getUserMedia)
-          // {
-          //    navigator.getUserMedia({ audio: true}, function(stream){ FMCaptureMicStream(stream); }, function(error){ console.log('Error capturing audio.'); } );
-          // } else { console.log('getUserMedia not supported in this browser.'); }
-          */
-
           //tested on mac
           navigator.getUserMedia = navigator.getUserMedia ||  navigator.webkitGetUserMedia ||  navigator.mozGetUserMedia ||  navigator.msGetUserMedia;
           if (navigator.mediaDevices)
