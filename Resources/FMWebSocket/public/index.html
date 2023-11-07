@@ -924,6 +924,8 @@ if(directionString !== "") {
 
 
         function compassToDirectionWithChanges(compassToConvert) {
+
+            console.log("COMPASS WENT TO:"+compassToConvert)
             if (typeof compassToDirectionWithChanges.previousDirections === 'undefined') {
                 compassToDirectionWithChanges.previousDirections = {};
             }
@@ -976,11 +978,11 @@ if(directionString !== "") {
 
         setInterval(function(){
 
-
-            if(joy.GetDir() !== "C") {
                 dodirection(compassToDirectionWithChanges(joy.GetDir()));
-                console.log(compassToDirectionWithChanges(joy.GetDir()));
-            }
+                console.log("DIR: "+compassToDirectionWithChanges(joy.GetDir()));
+                console.log("POS: "+joy.GetPosX());
+
+
         }, 50);
 
     </script>
@@ -1009,14 +1011,4 @@ if(directionString !== "") {
 
   </body>
 </html>
-Replace path_to_your_image.jpg with the actual path to your image.
 
-Serve the HTML: You can now save this code as an .html file and open it in a web browser. When you click on the image, it will hide, revealing anything that might be behind it (in this case, just a white background).
-
-If you have additional content behind the image that you want to reveal upon clicking, simply add that content to the <body> of the HTML
-
-
-
-
-</body>
-</html>
