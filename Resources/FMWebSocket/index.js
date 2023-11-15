@@ -8,6 +8,23 @@ const http = require("http");
 const app = express();
 app.use(express.static(__dirname + '/public'));
 const port = 3000;
+const firebase = require('firebase/app');
+
+require('firebase/auth');
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "kids.itslearnablelatest.test",
+  databaseURL: "https://kuliloapp.firebaseio.com",
+  projectId: "kuliloapp",
+  storageBucket: "kuliloapp.appspot.com",
+  messagingSenderId: "350768122893",
+  appId: "1:350768122893:web:d8b478ed53ba595d795944",
+  measurementId: "G-Z81Z0PE7FV"
+};
+
+firebase.initializeApp(firebaseConfig);
 
 
 app.get("/hello", (req, res) => {

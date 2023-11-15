@@ -6,7 +6,12 @@
    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <!--   <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
 
-      <style>
+
+
+
+
+
+    <style>
           table
           {
               padding:4px;
@@ -118,10 +123,184 @@
 
           /* Add additional styles for your dynamic content (island area) here */
       </style>
+
+
+    <!--   <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
+
+
+    <script type="module">
+
+
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDvkUzj0hXYlsEXd82JucuTP2xCdzCZX-I",
+            //authDomain: "kids.itslearnablelatest.test",
+            databaseURL: "https://kuliloapp.firebaseio.com",
+            projectId: "kuliloapp",
+            storageBucket: "kuliloapp.appspot.com",
+            messagingSenderId: "350768122893",
+            appId: "1:350768122893:web:d8b478ed53ba595d795944",
+            measurementId: "G-Z81Z0PE7FV"
+        };
+
+
+        firebase.initializeApp(firebaseConfig);
+
+
+
+        // FirebaseUI config
+        const uiConfig = {
+            callbacks: {
+                signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+
+                    checknumber(authResult.user.phoneNumber.replace("+", ""));
+
+// Set a cookie with the name "myCookie" and the value "exampleValue"
+                    document.cookie = "loggedin="+authResult.user.phoneNumber.replace("+", "");
+
+                    loginChecker();
+                    console.log("Sign In", authResult.user.phoneNumber.replace("+", ""));
+                    // User successfully signed in.
+                    // Return type determines whether we continue the redirect automatically
+                    // or whether we leave that to developer to handle.
+                    return false;
+                }
+
+            },
+            signInOptions: [{
+//          firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+                provider: firebase.auth.PhoneAuthProvider.PROVIDER_ID,
+                recaptchaParameters: {
+                    type: 'image', // 'audio'
+                    size: 'invisible', // 'invisible' or 'compact'
+                    badge: 'bottomright' //' bottomright' or 'inline' applies to invisible.
+                },
+
+            }
+            ]
+        };
+
+
+        var isSubscribed = false;
+
+        const ui = new firebaseui.auth.AuthUI(firebase.auth());
+
+
+        var user = firebase.auth().currentUser;
+
+        var phoneNumber = "";
+        if (user) {
+            // User is signed in.
+             phoneNumber = user.phoneNumber;
+             checknumber(phoneNumber);
+            console.log("User's phone number: " + phoneNumber);
+
+
+        }
+
+
+        async function checknumber(phoneNumber) {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            var raw = JSON.stringify({
+                "MSISDN": phoneNumber // Use the provided phone number parameter
+            });
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+                redirect: 'follow'
+            };
+
+            console.log("USERDATA RAN");
+
+            try {
+                const response = await fetch("https://kids.itslearnablelatest.test/api/checkphonenumber", requestOptions);
+                console.log(response);
+
+                console.log("USERDATA");
+
+                if (response.ok) {
+                    const responseData = await response.json();
+
+                    // Handle the successful response here
+                    //const userData = await response.text();
+                  //  console.log("UserData:", userData.user.subscribed);
+
+                    if(!responseData.user.subscribed){
+alert("You are not subscribed.")
+                    }else{
+                        isSubscribed = true;
+                        loginChecker();
+                    }
+
+                    return true; // Return true to indicate success
+                } else {
+                    console.log("USERDATA FAIL");
+                    return false; // Return false to indicate failure
+                }
+            } catch (error) {
+                console.error("Error UserData:", error);
+                return false; // Return false in case of an error
+            }
+        }
+
+        function loginChecker(){
+
+            if (checkLoggedIn() || isSubscribed) {
+                console.log("login exists.");
+                document.getElementById("gameFace").style.display = "block";
+
+            }else{
+
+
+                ui.start("#firebaseui-auth-container", uiConfig);
+
+                document.getElementById("gameFace").style.display = "none";
+
+            }
+
+        }
+
+        loginChecker();
+        // Initialize the FirebaseUI widget
+        //  const ui = new firebaseui.auth.AuthUI(auth);
+
+        function checkLoggedIn() {
+            const uloggedname = "loggedinuser";
+            // Split the cookie string into an array of cookies
+            var cookies = document.cookie.split(';');
+
+            // Iterate through the cookies and check if the specified cookie exists
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                // Check if the cookie name matches the provided name
+                if (cookie.startsWith(uloggedname + '=')) {
+                    // Cookie with the specified name exists
+                    return true;
+                }
+            }
+
+            // Cookie with the specified name does not exist
+            return false;
+        }
+
+
+
+
+
+    </script>
+
   </head>
   <body>
 
-
+<div id="gameFace">
 
       <table style="width:100%; display: none">
           <tr>
@@ -200,9 +379,15 @@
 
     <div id="joyDiv" style="width:200px;height:200px;margin:10px 50px;position:fixed;bottom:0px;left:0px; opacity: 0.5"></div>
 
+</div>
+
+      <div id="firebaseui-auth-container" style="margin-top: 50px"></div>
+      <div id="loader">Loading...</div>
 
 
-    <script type="text/javascript">
+
+
+      <script type="text/javascript">
         //You may set "canAutoConnectAsClient" to true, and it will automatically connect as client;
         var canAutoConnectAsClient = true;
 
