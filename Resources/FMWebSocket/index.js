@@ -50,8 +50,11 @@ function ByteToInt16(_byte, _offset)
 }
 
 ws.on('connection', function connection(ws) {
+
+
       const wsid = uuidv4();
       const networkType = 'undefined';
+//      const allocatedTo = 'undefined';
       const metadata = { ws, networkType, wsid };
 
       if(!clients.has(wsid))
@@ -117,11 +120,24 @@ ws.on('connection', function connection(ws) {
 
   ws.on('message', function incoming(message) {
     //var decodeString = new String(message);
-    //console.log(decodeString);
+    //console.log("messageis "+message);
+   // console.log("messageis "+message);
+  /*  var message = data;
+    if(data instanceof Buffer) {
+      // The ID is the first 14 bytes of the data.
+      const id = data.slice(0, 14).toString();
+
+      // The message data begins after the 14th byte.
+       message = data.slice(14);
+      console.log('WebSocket ID:', id); // Will output: 7fd82b73-28b5
+
+    }*/
+   // console.log('Message Data:', message.toString());
 
     //check registration
     if(message.length === 4)
     {
+     // console.log("WOOOP")
       if(message[0] === 0 && message[1] === 0 && message[2] === 9 && message[3] === 3)
       {
         serverID = wsid;
@@ -141,8 +157,13 @@ ws.on('connection', function connection(ws) {
       else if(message[0] === 0 && message[1] === 0 && message[2] === 9 && message[3] === 4)
       {
         console.log("regClient: " + wsid + "[Server] " + serverID);
-        clients.get(wsid).networkType = 'client';
 
+
+        clients.get(wsid).networkType = 'client';
+        //clients.get(wsid).allocatedTo = serverID
+        //clients.get(serverID).allocatedTo = wsid
+
+        //using a websocket connection. send a message to a specific cocket
         if(serverWS !== null)
         {
           //tell server about the new connected client
@@ -157,6 +178,8 @@ ws.on('connection', function connection(ws) {
     // if(message.length > 4 && message[0] === 0)
     if(message.length > 4)
     {
+//      console.log("WAAAP")
+
       if (serverID !== 'undefined')
       {
           switch(message[1])
@@ -168,37 +191,130 @@ ws.on('connection', function connection(ws) {
                   if(clientWSID !== serverID)
                   {
                     [...clients][i][1].ws.send(message);
+                    console.log("EMITED: "+clientWSID)
                   }
                 }
+                console.log("EMITED2: ZZZ")
+
                 //stream serverWS as the last one
                 serverWS.send(message);
                 break;
               //emit type: server;
               case 1:
+                console.log("EMITED2: WWW")
+
                 serverWS.send(message);
                 break;
               //emit type: others;
               case 2:
+                //sending to user
+               // console.log("EMITED2: GRR")
+
                 for (let i = 0; i < clients.size; i++) {
                   var clientWSID = [...clients][i][0];
                   if(clientWSID !== wsid)
                   {
                     [...clients][i][1].ws.send(message);
+                    console.log("EMITED2: "+clientWSID)
+
                   }
                 }
                 break;
               case 3:
-                  //send to target
+                //send to target
                   var _wsidByteLength = ByteToInt16(message, 4);
                   //_wsidByteLength
                   var _wsidByte = message.slice(6, 6 + _wsidByteLength);
+
+                 // console.log("LENGTH IS:"+_wsidByteLength);
+
                   var _wsid = String.fromCharCode(..._wsidByte);
-                  try{ clients.get(_wsid).ws.send(message); console.log("work! " + _wsid) } catch{}
+               // console.log("EMITED 3: "+_wsid)
+
+/*
+                if (clients.has(_wsid)) {
+                  console.log("EMITED 4: " + _wsid)
+
+                  if (clients.get(_wsid).networkType === "server") {
+                    console.log("EMITED 4: " + _wsid)
+
+                  }
+                }else{
+
+
+                   _wsidByteLength = ByteToInt16(message, 4);
+                  //_wsidByteLength
+                   _wsidByte = message.slice(4, 17);
+
+                  // console.log("LENGTH IS:"+_wsidByteLength);
+
+                   _wsid = String.fromCharCode(..._wsidByte);
+                  console.log("EMITED 5: " + _wsid)
+
+                  if (clients.get(_wsid).networkType === "server") {
+                    console.log("EMITED 5-: " + _wsid)
+
+                  }
+                }
+
+                */
+              //  message = message.slice(6 + _wsidByteLength, message.length);
+
+                // const sent_message = message.slice((6 + _wsidByteLength));
+                //  console.log("EMITED 4: "+_wsid)
+
+                if(_wsid.includes("left") || _wsid.includes("right") || _wsid.includes("up") || _wsid.includes("down") || _wsid.includes("ick-")){
+
+                  _wsidByteLength = ByteToInt16(message, 4);
+                  //_wsidByteLength
+                  _wsidByte = message.slice(-13);
+
+                  message = message.slice(0, -13);
+
+
+                  // console.log("LENGTH IS:"+_wsidByteLength);
+
+                   _wsid = String.fromCharCode(..._wsidByte);
+
+                  console.log("GOT IT1: "+_wsid)
+
+                  console.log("GOT IT0: "+clients.get(_wsid).networkType)
+
+
+              //    clients.get(_wsid).ws.send(message);
+
+/*
+                  for (let i = 0; i < clients.size; i++) {
+                     clientWSID = [...clients][i][0];
+
+                      [...clients][i][1].ws.send(message);
+                      console.log("EMITEDXX: "+clientWSID)
+
+
+                  }
+
+                  for (let i = 0; i < clients.size; i++) {
+                     clientWSID = [...clients][i][0];
+
+                      [...clients][i][1].ws.send(message);
+                      console.log("EMITEDZZ: "+clientWSID)
+
+                  }
+                  */
+
+                }
+
+                try{
+
+                  clients.get(_wsid).ws.send(message);
+
+                } catch{
+
+                  console.log("FAILLLL FOR: "+_wsid);
+                }
                   break;
           }
-      }
-      else
-      {
+      } else {
           console.log('cannot find any active server');
       }
     }
